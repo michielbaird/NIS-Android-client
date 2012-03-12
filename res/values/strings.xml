@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, AndroidClientActivity!</string>
+    <string name="app_name">Android Client</string>
+    <string name="handleDescription">Please enter the user handle</string>
+    <string name="connect">Connect</string>
+
+</resources>
