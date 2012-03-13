@@ -5,5 +5,8 @@
     <string name="app_name">Android Client</string>
     <string name="handleDescription">Please enter the user handle</string>
     <string name="connect">Connect</string>
+    <string name="Send">send</string>
+    <string name="send">Send</string>
+    <string name="editMessage">Enter message and send</string>
 
 </resources>

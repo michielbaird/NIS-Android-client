@@ -23,6 +23,7 @@ public class ClientService extends Service {
 	}
 	
 	public static final int UPDATE_USER_LIST = 1;
+	public static final int MESSAGE_RECEIVED = 2;
 
 	private static final int clientPort = 8082;
 	private static final String serverAddress = "192.168.0.5";
@@ -31,6 +32,7 @@ public class ClientService extends Service {
 	private Intent intent;
 	private Set<String> userList = null;
 	private ClientCallbacks callbacks;
+	private ClientMessages messages;
 	private ClientActivityI displayCallback = null;
 	private Client client;
 	private String clientHandle;
@@ -57,13 +59,22 @@ public class ClientService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		clientHandle = intent.getStringExtra("handle");
+		messages = new ClientMessages(clientHandle); 
 		callbacks =  new ClientCallbacks() {
 			@Override
 			public void onClientListReceived(Set<String> clientList) {
+				userList = clientList;
 				if (displayCallback != null) {
 					displayCallback.clientMessage(UPDATE_USER_LIST);
 				}
-				userList = clientList;
+			}
+
+			@Override
+			public void onClientMessageRecieved(String handle, String message) {
+				messages.addReceivedMessage(handle, message);
+				if (displayCallback != null) {
+					displayCallback.clientMessage(MESSAGE_RECEIVED);
+				}
 			}
 		};
 		client =  new Client(clientHandle,getLocalIpAddress(), clientPort,
