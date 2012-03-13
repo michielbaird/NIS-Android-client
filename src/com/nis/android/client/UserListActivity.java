@@ -73,8 +73,10 @@ public class UserListActivity extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
-		super.onListItemClick(l, v, position, id);
+		Intent startLogin = new Intent(UserListActivity.this, MessageViewActivity.class);
+		startLogin.putExtra("handle", clientArrayList.get(position));
+		
+		startActivity(startLogin);
 	}
 
 	private Handler mHandler = new Handler() {
@@ -93,6 +95,7 @@ public class UserListActivity extends ListActivity {
 			}
 		};
 	};
+	
 
 	private void updateUserList() {
 		final Set<String> userList = service.getUserList();

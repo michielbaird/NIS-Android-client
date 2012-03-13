@@ -47,6 +47,14 @@ public class ClientMessages {
 			messages.add(new DisplayMessage(date, sender, message));
 			
 		}
+		
+		public DisplayMessage getMessage(int position) {
+			return messages.get(position);
+		}
+		
+		public ArrayList<DisplayMessage> getRawList() {
+			return messages;
+		}
 	}
 
 	private HashMap<String, MessageList> messageLists;
