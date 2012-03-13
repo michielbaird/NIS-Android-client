@@ -18,22 +18,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.nis.android.client.ClientService.ClientActivityI;
-import com.nis.android.client.ClientService.MyBinder;
-import com.nis.client.Client;
-import com.nis.client.ClientCallbacks;
 
 public class UserListActivity extends ListActivity {
 
-	//private static final int clientPort = 8082;
-	//private static final String serverAddress = "192.168.0.5";
-	//private static final int serverPort = 8081;
 	
 	ClientService service;
 	private ClientActivityI callback;
 	ArrayList<String> clientArrayList = new ArrayList<String>();
 	ArrayAdapter<String> adapter;
-	//private String clientHandle;
-	
 
 	private ProgressDialog dialog;
 	private ListView listView;
@@ -93,7 +85,9 @@ public class UserListActivity extends ListActivity {
 			case ClientService.UPDATE_USER_LIST:
 				updateUserList();
 				break;
-
+			case ClientService.MESSAGE_RECEIVED:
+				messageRecieved();
+				break;
 			default:
 				break;
 			}
@@ -107,5 +101,9 @@ public class UserListActivity extends ListActivity {
 			clientArrayList.add(handle);
 		}
 		adapter.notifyDataSetChanged();
+	}
+	
+	private void messageRecieved() {
+		
 	}
 }
