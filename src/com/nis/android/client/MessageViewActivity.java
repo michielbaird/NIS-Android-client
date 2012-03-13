@@ -14,7 +14,7 @@ public class MessageViewActivity extends Activity {
 		setContentView(R.layout.chat_window);
 		MessageList messages = new MessageList();
 		messages.addMessage("test", "test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test ");
-		messages.addMessage("test", "test2");
+		messages.addMessage("test2", "test2");
 		messageListView = (ListView)findViewById(R.id.messageView1);
 		
 		messageListView.setAdapter(new MessageListAdapter(this, messages));

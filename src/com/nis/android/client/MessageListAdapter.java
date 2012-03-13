@@ -27,19 +27,35 @@ public class MessageListAdapter extends ArrayAdapter<DisplayMessage> {
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View rowView = convertView;
-		if (rowView == null) {
-			LayoutInflater inflater = context.getLayoutInflater();
-			rowView = inflater.inflate(R.layout.client_message, null);
-			MessageTag tag = new MessageTag();
-			tag.messageView = (TextView)rowView.findViewById(R.id.messageView1);
-			tag.timeView = (TextView)rowView.findViewById(R.id.timeView1);
-			rowView.setTag(tag);
-		}
-		
-		MessageTag tag = (MessageTag)rowView.getTag();
 		DisplayMessage message = messageList.getMessage(position);
-		tag.messageView.setText(message.getMessages());
-		return rowView;
+		if (message.getSender().equals("test")){
+			View rowView = convertView;
+			if (rowView == null) {
+				LayoutInflater inflater = context.getLayoutInflater();
+				rowView = inflater.inflate(R.layout.client_message, null);
+				MessageTag tag = new MessageTag();
+				tag.messageView = (TextView)rowView.findViewById(R.id.messageView1);
+				tag.timeView = (TextView)rowView.findViewById(R.id.timeView1);
+				rowView.setTag(tag);
+			}
+			
+			MessageTag tag = (MessageTag)rowView.getTag();
+			tag.messageView.setText(message.getMessages());
+			return rowView;
+		} else {
+			View rowView = convertView;
+			if (rowView == null) {
+				LayoutInflater inflater = context.getLayoutInflater();
+				rowView = inflater.inflate(R.layout.remote_message, null);
+				MessageTag tag = new MessageTag();
+				tag.messageView = (TextView)rowView.findViewById(R.id.messageView1);
+				tag.timeView = (TextView)rowView.findViewById(R.id.timeView1);
+				rowView.setTag(tag);
+			}
+			
+			MessageTag tag = (MessageTag)rowView.getTag();
+			tag.messageView.setText(message.getMessages());
+			return rowView;
+		}
 	}
 }
