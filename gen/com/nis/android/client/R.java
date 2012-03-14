@@ -12,22 +12,36 @@ public final class R {
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
+        public static final int speech1=0x7f020001;
+        public static final int speech2=0x7f020002;
     }
     public static final class id {
-        public static final int connectButton=0x7f050003;
-        public static final int editHandle=0x7f050002;
-        public static final int signIn=0x7f050000;
-        public static final int textHandle=0x7f050001;
+        public static final int button1=0x7f050004;
+        public static final int connectButton=0x7f050009;
+        public static final int editHandle=0x7f050008;
+        public static final int editText1=0x7f050003;
+        public static final int linearLayout1=0x7f050002;
+        public static final int messageView1=0x7f050001;
+        public static final int signIn=0x7f050006;
+        public static final int textHandle=0x7f050007;
+        public static final int textView1=0x7f050000;
+        public static final int timeView1=0x7f050005;
     }
     public static final class layout {
-        public static final int list_item=0x7f030000;
-        public static final int main=0x7f030001;
-        public static final int user_list_screen=0x7f030002;
+        public static final int chat_window=0x7f030000;
+        public static final int client_message=0x7f030001;
+        public static final int list_item=0x7f030002;
+        public static final int main=0x7f030003;
+        public static final int remote_message=0x7f030004;
+        public static final int user_list_screen=0x7f030005;
     }
     public static final class string {
+        public static final int Send=0x7f040004;
         public static final int app_name=0x7f040001;
         public static final int connect=0x7f040003;
+        public static final int editMessage=0x7f040006;
         public static final int handleDescription=0x7f040002;
         public static final int hello=0x7f040000;
+        public static final int send=0x7f040005;
     }
 }
