@@ -65,7 +65,7 @@ public class UserListActivity extends ListActivity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder binder) {
 			service = ((ClientService.MyBinder) binder).getService();
-			service.setDisplayCallback(callback);
+			service.setUserListCallback(callback);
 			mHandler.sendEmptyMessage(ClientService.UPDATE_USER_LIST);
 			
 		}

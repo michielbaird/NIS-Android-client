@@ -1,5 +1,6 @@
 package com.nis.android.client;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -9,9 +10,9 @@ import java.util.Set;
 import com.nis.client.Client;
 import com.nis.client.ClientCallbacks;
 
-import android.R.string;
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -26,14 +27,14 @@ public class ClientService extends Service {
 	public static final int MESSAGE_RECEIVED = 2;
 
 	private static final int clientPort = 8082;
-	private static final String serverAddress = "192.168.0.5";
+	private static final String serverAddress = "137.158.60.219";
 	private static final int serverPort = 8081;
 
-	private Intent intent;
 	private Set<String> userList = null;
-	private ClientCallbacks callbacks;
+	private ClientCallbacks clientCallbacks;
 	private ClientMessages messages;
-	private ClientActivityI displayCallback = null;
+	private ClientActivityI userListCallback = null;
+	private ClientActivityI messageCallbacks = null;
 	private Client client;
 	private String clientHandle;
 	private final IBinder mBinder = new MyBinder();
@@ -53,43 +54,53 @@ public class ClientService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		intent = new Intent(this, ClientService.class);
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		clientHandle = intent.getStringExtra("handle");
 		messages = new ClientMessages(clientHandle); 
-		callbacks =  new ClientCallbacks() {
+		clientCallbacks =  new ClientCallbacks() {
 			@Override
 			public void onClientListReceived(Set<String> clientList) {
 				userList = clientList;
-				if (displayCallback != null) {
-					displayCallback.clientMessage(UPDATE_USER_LIST);
+				if (userListCallback != null) {
+					userListCallback.clientMessage(UPDATE_USER_LIST);
 				}
 			}
 
 			@Override
 			public void onClientMessageRecieved(String handle, String message) {
 				messages.addReceivedMessage(handle, message);
-				if (displayCallback != null) {
-					displayCallback.clientMessage(MESSAGE_RECEIVED);
+				if (userListCallback != null) {
+					userListCallback.clientMessage(MESSAGE_RECEIVED);
+				} 
+				if (messageCallbacks != null) {
+					messageCallbacks.clientMessage(MESSAGE_RECEIVED);
 				}
 			}
 		};
 		client =  new Client(clientHandle,getLocalIpAddress(), clientPort,
-				serverAddress, serverPort, callbacks);
+				serverAddress, serverPort, clientCallbacks);
 		
 		
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	public void setDisplayCallback(ClientActivityI callback){
-		displayCallback = callback;
+	public void setUserListCallback(ClientActivityI callback){
+		userListCallback = callback;
+	}
+	
+	public void setMessageCallback(ClientActivityI callback){
+		messageCallbacks = callback;
 	}
 
-	public void clearDisplayCallback() {
-		displayCallback = null;
+	public void clearUserListCallback() {
+		userListCallback = null;
+	}
+	
+	public void clearMessageCallback() {
+		messageCallbacks = null;
 	}
 
 	public boolean hasUserList() {
@@ -98,6 +109,22 @@ public class ClientService extends Service {
 
 	public Set<String> getUserList() {
 		return userList;
+	}
+	
+	public ClientMessages getClientMessages() {
+		return messages;
+	}
+	
+	public void sendMessage(String handle, String message) {
+		client.sendMessage(handle, message);
+	}
+	
+	public void sendFile(final String handle, final File file) {
+		new Thread() {
+			public void run() {
+				client.sendFileToClient(handle, file.getAbsolutePath());
+			};
+		}.start();
 	}
 	
     // gets the ip address of your phone's network
@@ -115,5 +142,4 @@ public class ClientService extends Service {
         }
         return null;
     }
-
 }
