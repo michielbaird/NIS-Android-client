@@ -7,13 +7,24 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Set;
 
+import org.w3c.dom.Notation;
+
 import com.nis.client.Client;
 import com.nis.client.ClientCallbacks;
+import com.nis.client.ClientCallbacks.ConfirmResult;
+import com.nis.shared.requests.SendFile;
 
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -21,8 +32,10 @@ public class ClientService extends Service {
 	
 	public interface ClientActivityI {
 		public void clientMessage(int message);
+		ConfirmResult receiveFile(SendFile sendfile);
 	}
 	
+	public final Handler handler =  new Handler();
 	public static final int UPDATE_USER_LIST = 1;
 	public static final int MESSAGE_RECEIVED = 2;
 
@@ -78,6 +91,38 @@ public class ClientService extends Service {
 				if (messageCallbacks != null) {
 					messageCallbacks.clientMessage(MESSAGE_RECEIVED);
 				}
+			}
+
+			@Override
+			public void onFileReceived(String filename) {
+				NotificationManager notificationManager 
+					= (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+				Notification fileReceived = new Notification();
+				fileReceived.tickerText = "File: " + filename + "received.";
+				fileReceived.when = System.currentTimeMillis();
+				Intent notificationIntent = new Intent(ClientService.this,
+					    ClientService.class);
+				PendingIntent contentIntent = PendingIntent.getActivity(ClientService.this, 0,
+					    notificationIntent, 0);
+				fileReceived.contentIntent = contentIntent;
+				notificationManager.notify(1, fileReceived);
+				
+			}
+
+			@Override
+			public ConfirmResult onIncomingFile(SendFile sendFile)  {
+				final ConfirmResult conf = new ConfirmResult();
+				conf.fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/test2.mp3";
+				conf.accept = false;
+				final String filename = sendFile.filename;
+				if (filename.contains("/")) {
+					conf.accept = false;
+					return conf;
+				}
+				if (messageCallbacks != null) {
+					return messageCallbacks.receiveFile(sendFile);
+				}
+				return conf;
 			}
 		};
 		client =  new Client(clientHandle,getLocalIpAddress(), clientPort,

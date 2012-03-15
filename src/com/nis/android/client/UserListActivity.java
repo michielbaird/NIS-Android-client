@@ -18,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.nis.android.client.ClientService.ClientActivityI;
+import com.nis.client.ClientCallbacks.ConfirmResult;
+import com.nis.shared.requests.SendFile;
 
 public class UserListActivity extends ListActivity {
 
@@ -38,6 +40,11 @@ public class UserListActivity extends ListActivity {
 			@Override
 			public void clientMessage(int message) {
 				mHandler.sendEmptyMessage(message);
+			}
+
+			@Override
+			public ConfirmResult receiveFile(SendFile sendfile) {
+				return null;
 			};
 		};
 

@@ -7,6 +7,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import android.os.Handler;
+
+import com.nis.client.Handle;
+
 public class ClientMessages {
 	public static class DisplayMessage {
 		private final Date timestamp;

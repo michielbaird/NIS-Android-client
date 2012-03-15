@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -24,6 +26,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.nis.android.client.ClientService.ClientActivityI;
+import com.nis.client.ClientCallbacks.ConfirmResult;
+import com.nis.shared.requests.SendFile;
 
 public class MessageViewActivity extends Activity {
 	ListView messageListView;
@@ -41,6 +45,10 @@ public class MessageViewActivity extends Activity {
 			@Override
 			public void clientMessage(int message) {
 				mHandler.sendEmptyMessage(message);
+			}
+			@Override
+			public ConfirmResult receiveFile(SendFile sendFile) {
+				return confirmFileRecieve(sendFile);
 			}
 		};
 		Intent intent = getIntent();
@@ -69,6 +77,37 @@ public class MessageViewActivity extends Activity {
 		
 	}
 	
+	protected ConfirmResult confirmFileRecieve(final SendFile sendFile) {
+		final ConfirmResult conf =  new ConfirmResult();
+		
+		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		            //Yes button clicked
+		        	conf.accept = true;
+		        	conf.fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/" + sendFile.filename;
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		mHandler.post( new Runnable() {
+			@Override
+			public void run() {
+				AlertDialog.Builder builder = new AlertDialog.Builder(MessageViewActivity.this);
+				builder.setMessage("Would you like to receive a file?").setPositiveButton("Yes", dialogClickListener)
+				    .setNegativeButton("No", dialogClickListener).show();
+			}
+		});
+		return conf;
+
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflator = getMenuInflater();
