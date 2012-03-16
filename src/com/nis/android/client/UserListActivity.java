@@ -3,13 +3,16 @@ package com.nis.android.client;
 import java.util.ArrayList;
 import java.util.Set;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -43,8 +46,8 @@ public class UserListActivity extends ListActivity {
 			}
 
 			@Override
-			public ConfirmResult receiveFile(SendFile sendfile) {
-				return null;
+			public ConfirmResult receiveFile(SendFile sendFile) {
+				return confirmFileRecieve(sendFile);
 			};
 		};
 
@@ -102,6 +105,50 @@ public class UserListActivity extends ListActivity {
 			}
 		};
 	};
+	
+	protected ConfirmResult confirmFileRecieve(final SendFile sendFile) {
+		final ConfirmResult conf =  new ConfirmResult();
+		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		            //Yes button clicked
+		        	synchronized (conf) {
+		        		conf.accept = true;
+			        	conf.fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/" + sendFile.filename;
+			        	conf.notify();
+					}
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		        	synchronized (conf) {
+		        		conf.accept = false;
+		        		conf.notify();
+		        	}
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		mHandler.post( new Runnable() {
+			@Override
+			public void run() {
+				AlertDialog.Builder builder = new AlertDialog.Builder(UserListActivity.this);
+				builder.setMessage("Would you like to receive a file?").setPositiveButton("Yes", dialogClickListener)
+				    .setNegativeButton("No", dialogClickListener).show();
+			}
+		});
+		synchronized (conf) {
+			try {
+				conf.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return conf;
+	}
 	
 
 	private void updateUserList() {

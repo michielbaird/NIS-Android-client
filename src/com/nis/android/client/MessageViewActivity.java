@@ -10,11 +10,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.MediaStore.Images.ImageColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,12 +26,16 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.nis.android.client.ClientService.ClientActivityI;
 import com.nis.client.ClientCallbacks.ConfirmResult;
 import com.nis.shared.requests.SendFile;
 
 public class MessageViewActivity extends Activity {
+	private final int SEND_FILE = 1001;
+
+	
 	ListView messageListView;
 	String activeHandle;
 	ClientActivityI callback;
@@ -41,6 +47,7 @@ public class MessageViewActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_window);
+		
 		callback =  new ClientActivityI() {
 			@Override
 			public void clientMessage(int message) {
@@ -54,6 +61,8 @@ public class MessageViewActivity extends Activity {
 		Intent intent = getIntent();
 		if (intent.hasExtra("handle")) {
 			activeHandle = intent.getStringExtra("handle");
+			TextView textView = (TextView)findViewById(R.id.textView1);
+			textView.setText(activeHandle);
 		}
 		
 		bindService(new Intent(this, ClientService.class), mConnection,
@@ -64,33 +73,38 @@ public class MessageViewActivity extends Activity {
 			public void onClick(View v) {
 				EditText editMessage =  (EditText) MessageViewActivity.this.
 						findViewById(R.id.editMessage);
-				String message = editMessage.getText().toString();
-				if (service != null) {
+				String message = editMessage.getText().toString().trim();
+				if (service != null && !message.equals("")) {
 					service.sendMessage(activeHandle, message);
 					editMessage.setText("");
 					ClientMessages messages = service.getClientMessages();
-					messages.addSentMessage(activeHandle, message);
+					messages.addSentMessage(activeHandle, message);	
 					userAdapters.get(activeHandle).notifyDataSetChanged();
 				}
 			}
 		});
-		
 	}
 	
 	protected ConfirmResult confirmFileRecieve(final SendFile sendFile) {
 		final ConfirmResult conf =  new ConfirmResult();
-		
 		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
 		            //Yes button clicked
-		        	conf.accept = true;
-		        	conf.fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/" + sendFile.filename;
+		        	synchronized (conf) {
+		        		conf.accept = true;
+			        	conf.fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/" + sendFile.filename;
+			        	conf.notify();
+					}
 		            break;
 
 		        case DialogInterface.BUTTON_NEGATIVE:
+		        	synchronized (conf) {
+		        		conf.accept = false;
+		        		conf.notify();
+		        	}
 		            //No button clicked
 		            break;
 		        }
@@ -104,8 +118,15 @@ public class MessageViewActivity extends Activity {
 				    .setNegativeButton("No", dialogClickListener).show();
 			}
 		});
+		synchronized (conf) {
+			try {
+				conf.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return conf;
-
 	}
 
 	@Override
@@ -118,8 +139,14 @@ public class MessageViewActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.send_file:
-			sendFile();
+		case R.id.send_picture:
+			sendPicture();
+			return true;
+		case R.id.send_video:
+			sendVideo();
+			return true;
+		case R.id.send_song:
+			sendSong();
 			return true;
 		default:
 			return super.onContextItemSelected(item);
@@ -128,18 +155,60 @@ public class MessageViewActivity extends Activity {
 		
 	}
 	
-	private void sendFile() {
+	private void sendPicture() {
+		Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+		photoPickerIntent.setType("image/*");
+		startActivityForResult(photoPickerIntent, SEND_FILE);
+		String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/";
+		File path = new File(filePath);
+		if (!path.exists()){
+			path.mkdir();
+		} 
+	}
+	
+	private void sendVideo() {
+		Intent viedoPickerIntent = new Intent(Intent.ACTION_PICK);
+		viedoPickerIntent.setType("video/*");
+		startActivityForResult(viedoPickerIntent, SEND_FILE);
 		String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/";
 		File path = new File(filePath);
 		if (!path.exists()){
 			path.mkdir();
 		}
-		File file = new File(filePath + "test.mp3");
-		if (file.exists() && file.isFile() ){
-			service.sendFile(activeHandle, file);
+	}
+	
+	private void sendSong() {
+		Intent viedoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+		viedoPickerIntent.setType("audio/*");
+		startActivityForResult(viedoPickerIntent, SEND_FILE);
+		String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/";
+		File path = new File(filePath);
+		if (!path.exists()){
+			path.mkdir();
 		}
-		
-		Log.e("File list: ",file.getAbsolutePath() + "");
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		// TODO Auto-generated method stub
+		  super.onActivityResult(requestCode, resultCode, intent);
+		  if (requestCode == SEND_FILE) {
+			  if (intent != null) {
+				  Cursor cursor = getContentResolver().query(intent.getData(), null, null, null, null);
+				  cursor.moveToFirst();  //if not doing this, 01-22 19:17:04.564: ERROR/AndroidRuntime(26264): Caused by: android.database.CursorIndexOutOfBoundsException: Index -1 requested, with a size of 1
+				  int idx = cursor.getColumnIndex(ImageColumns.DATA);
+				  String fileSrc = cursor.getString(idx);
+				  Log.d("test", "File:" + fileSrc);
+				  File file = new File(fileSrc);
+				  if (file.exists() && file.isFile() && service != null){
+					 service.sendFile(activeHandle, file);
+				  }
+
+			  }
+			  else {
+				  Log.d("test", "idButSelPic Photopicker canceled");
+			  }
+		  }
 	}
 
 	private ServiceConnection mConnection = new ServiceConnection() {

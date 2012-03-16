@@ -7,6 +7,7 @@
 
     <TextView
         android:id="@+id/textView1"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
@@ -26,9 +27,6 @@
         android:layout_weight="1">
 
     </ListView>
-        
-
-
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -37,7 +35,9 @@
 
         <EditText
             android:id="@+id/editMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
+            android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
+        	android:imeOptions="actionSend|flagNoEnterAction"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/editMessage" >

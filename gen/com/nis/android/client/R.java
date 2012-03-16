@@ -22,7 +22,9 @@ public final class R {
         public static final int editMessage=0x7f060003;
         public static final int linearLayout1=0x7f060002;
         public static final int messageView1=0x7f060001;
-        public static final int send_file=0x7f06000a;
+        public static final int send_picture=0x7f06000a;
+        public static final int send_song=0x7f06000c;
+        public static final int send_video=0x7f06000b;
         public static final int signIn=0x7f060006;
         public static final int textHandle=0x7f060007;
         public static final int textView1=0x7f060000;
@@ -48,5 +50,8 @@ public final class R {
         public static final int hello=0x7f040000;
         public static final int send=0x7f040005;
         public static final int send_file=0x7f040007;
+        public static final int send_picture=0x7f040008;
+        public static final int send_song=0x7f04000a;
+        public static final int send_video=0x7f040009;
     }
 }

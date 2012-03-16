@@ -121,6 +121,8 @@ public class ClientService extends Service {
 				}
 				if (messageCallbacks != null) {
 					return messageCallbacks.receiveFile(sendFile);
+				} else if (userListCallback != null) {
+					return userListCallback.receiveFile(sendFile);
 				}
 				return conf;
 			}
