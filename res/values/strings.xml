@@ -8,5 +8,9 @@
     <string name="Send">send</string>
     <string name="send">Send</string>
     <string name="editMessage">Enter message and send</string>
+    <string name="send_file">Send File...</string>
+    <string name="send_picture">Send picture</string>
+    <string name="send_video">Send Video</string>
+    <string name="send_song">Send Song</string>
 
 </resources>
