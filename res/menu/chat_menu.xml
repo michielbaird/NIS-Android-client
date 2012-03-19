@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/send_picture" android:title="@string/send_picture" android:checkable="true"></item>
+    <item android:id="@+id/send_video" android:title="@string/send_video"></item>
+    <item android:id="@+id/send_song" android:title="@string/send_song"></item>
+    
+
+</menu>
