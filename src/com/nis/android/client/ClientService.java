@@ -112,7 +112,7 @@ public class ClientService extends Service {
 			@Override
 			public ConfirmResult onIncomingFile(SendFile sendFile)  {
 				final ConfirmResult conf = new ConfirmResult();
-				conf.fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/test2.mp3";
+				conf.fileName = "";
 				conf.accept = false;
 				final String filename = sendFile.filename;
 				if (filename.contains("/")) {
@@ -177,11 +177,14 @@ public class ClientService extends Service {
     // gets the ip address of your phone's network
     private String getLocalIpAddress() {
         try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> en = NetworkInterface
+            		.getNetworkInterfaces(); en.hasMoreElements();) {
                 NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
+                		enumIpAddr.hasMoreElements();) {
                     InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress()) { return inetAddress.getHostAddress().toString(); }
+                    if (!inetAddress.isLoopbackAddress())
+                    { return inetAddress.getHostAddress().toString(); }
                 }
            }
         } catch (SocketException ex) {

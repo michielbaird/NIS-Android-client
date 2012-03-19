@@ -87,7 +87,8 @@ public class MessageViewActivity extends Activity {
 	
 	protected ConfirmResult confirmFileRecieve(final SendFile sendFile) {
 		final ConfirmResult conf =  new ConfirmResult();
-		final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		final DialogInterface.OnClickListener dialogClickListener = 
+				new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
@@ -95,7 +96,10 @@ public class MessageViewActivity extends Activity {
 		            //Yes button clicked
 		        	synchronized (conf) {
 		        		conf.accept = true;
-			        	conf.fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/" + sendFile.filename;
+			        	conf.fileName = Environment
+			        			.getExternalStorageDirectory()
+			        			.getAbsolutePath() + "/SecureFT/" +
+			        			sendFile.filename;
 			        	conf.notify();
 					}
 		            break;
@@ -113,9 +117,11 @@ public class MessageViewActivity extends Activity {
 		mHandler.post( new Runnable() {
 			@Override
 			public void run() {
-				AlertDialog.Builder builder = new AlertDialog.Builder(MessageViewActivity.this);
-				builder.setMessage("Would you like to receive a file?").setPositiveButton("Yes", dialogClickListener)
-				    .setNegativeButton("No", dialogClickListener).show();
+				AlertDialog.Builder builder = 
+						new AlertDialog.Builder(MessageViewActivity.this);
+				builder.setMessage("Would you like to receive a file?")
+						.setPositiveButton("Yes", dialogClickListener)
+						.setNegativeButton("No", dialogClickListener).show();
 			}
 		});
 		synchronized (conf) {
@@ -159,7 +165,8 @@ public class MessageViewActivity extends Activity {
 		Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
 		photoPickerIntent.setType("image/*");
 		startActivityForResult(photoPickerIntent, SEND_FILE);
-		String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/";
+		String filePath = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/SecureFT/";
 		File path = new File(filePath);
 		if (!path.exists()){
 			path.mkdir();
@@ -170,7 +177,8 @@ public class MessageViewActivity extends Activity {
 		Intent viedoPickerIntent = new Intent(Intent.ACTION_PICK);
 		viedoPickerIntent.setType("video/*");
 		startActivityForResult(viedoPickerIntent, SEND_FILE);
-		String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/";
+		String filePath = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/SecureFT/";
 		File path = new File(filePath);
 		if (!path.exists()){
 			path.mkdir();
@@ -181,7 +189,8 @@ public class MessageViewActivity extends Activity {
 		Intent viedoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
 		viedoPickerIntent.setType("audio/*");
 		startActivityForResult(viedoPickerIntent, SEND_FILE);
-		String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SecureFT/";
+		String filePath = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/SecureFT/";
 		File path = new File(filePath);
 		if (!path.exists()){
 			path.mkdir();
@@ -189,13 +198,15 @@ public class MessageViewActivity extends Activity {
 	}
 	
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+	protected void onActivityResult(int requestCode, int resultCode, 
+			Intent intent) {
 		// TODO Auto-generated method stub
 		  super.onActivityResult(requestCode, resultCode, intent);
 		  if (requestCode == SEND_FILE) {
 			  if (intent != null) {
-				  Cursor cursor = getContentResolver().query(intent.getData(), null, null, null, null);
-				  cursor.moveToFirst();  //if not doing this, 01-22 19:17:04.564: ERROR/AndroidRuntime(26264): Caused by: android.database.CursorIndexOutOfBoundsException: Index -1 requested, with a size of 1
+				  Cursor cursor = getContentResolver().query(intent.getData(),
+						  null, null, null, null);
+				  cursor.moveToFirst();  
 				  int idx = cursor.getColumnIndex(ImageColumns.DATA);
 				  String fileSrc = cursor.getString(idx);
 				  Log.d("test", "File:" + fileSrc);
@@ -229,7 +240,8 @@ public class MessageViewActivity extends Activity {
 				ClientMessages messages = service.getClientMessages();
 				userAdapters.put(activeHandle,
 						new MessageListAdapter(MessageViewActivity.this,
-								messages.getMessageList(activeHandle),activeHandle));
+								messages.getMessageList(activeHandle), 
+								activeHandle));
 			}
 			messageListView.setAdapter(userAdapters.get(activeHandle));
 		}
