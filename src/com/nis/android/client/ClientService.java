@@ -1,6 +1,11 @@
 package com.nis.android.client;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -11,6 +16,7 @@ import org.w3c.dom.Notation;
 
 import com.nis.client.Client;
 import com.nis.client.ClientCallbacks;
+import com.nis.client.ClientKeys;
 import com.nis.client.ClientCallbacks.ConfirmResult;
 import com.nis.shared.requests.SendFile;
 
@@ -21,6 +27,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
@@ -73,6 +82,23 @@ public class ClientService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		clientHandle = intent.getStringExtra("handle");
 		messages = new ClientMessages(clientHandle); 
+		
+		String keyfile = clientHandle + ".key";
+		ClientKeys keys = null;
+		try {
+			InputStream fin = getResources().getAssets().open(keyfile);
+			ObjectInputStream keyin = new ObjectInputStream(fin);
+			keys = (ClientKeys) keyin.readObject();
+			keyin.close();
+			fin.close();
+		} catch (IOException e) {
+			// Should never happen
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// Should never happen
+			e.printStackTrace();
+		}
+		
 		clientCallbacks =  new ClientCallbacks() {
 			@Override
 			public void onClientListReceived(Set<String> clientList) {
@@ -127,8 +153,8 @@ public class ClientService extends Service {
 				return conf;
 			}
 		};
-		client =  new Client(clientHandle,getLocalIpAddress(), clientPort,
-				serverAddress, serverPort, clientCallbacks);
+		client =  new Client(getLocalIpAddress(), clientPort,
+				serverAddress, serverPort, clientCallbacks,keys);
 		
 		
 		return super.onStartCommand(intent, flags, startId);
