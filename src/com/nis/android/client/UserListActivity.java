@@ -5,7 +5,6 @@ import java.util.Set;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,9 +31,6 @@ public class UserListActivity extends ListActivity {
 	ArrayList<String> clientArrayList = new ArrayList<String>();
 	ArrayAdapter<String> adapter;
 
-	private ProgressDialog dialog;
-	private ListView listView;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,8 +50,6 @@ public class UserListActivity extends ListActivity {
 		adapter = new ArrayAdapter<String>(this,R.layout.list_item,clientArrayList);
 		setListAdapter(adapter);
 		bindService(new Intent(this, ClientService.class), mConnection, Context.BIND_AUTO_CREATE);
-		
-		listView = getListView();
 		
 	}
 
